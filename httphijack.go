@@ -12,6 +12,7 @@ func main() {
 	http.HandleFunc("/hijack", hijackHandler)
 	http.HandleFunc("/pipe", testPipe)
 	http.HandleFunc("/viewyt", Tran)
+	http.HandleFunc("/stream", Stream)
 	log.Println("HTTP Server...9092")
 	log.Fatal(http.ListenAndServe(":9092", nil))
 
@@ -110,4 +111,17 @@ func Tran(w http.ResponseWriter, req *http.Request) {
 	if(err != nil){
 		log.Println(err.Error())
 	}
+}
+
+func Stream(w http.ResponseWriter, req *http.Request){
+	cmd := fmt.Sprintln("ffmpeg -i videos/sample.mp4 -f mp4 pipe:2")
+	cmdFF := exec.Command("bash", "-c", cmd)
+	cmdFF.Stdout = w
+	err := cmdFF.Run()
+	if(err != nil){
+		log.Println(err.Error())
+	}
+
+	//vReader := bytes.NewReader(cmdFF.Stdout)
+	//http.ServeContent(w, req, "sample.mp4", time.Now(), cmdFF.Stdout)
 }
